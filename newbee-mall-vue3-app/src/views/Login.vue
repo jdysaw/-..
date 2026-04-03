@@ -14,28 +14,11 @@
     <img class="logo" src="https://s.yezgea02.com/1604045825972/newbee-mall-vue3-app-logo.png" alt="">
     <div v-if="state.type == 'login'" class="login-body login">
       <van-form @submit="onSubmit">
-        <van-field
-          v-model="state.username"
-          name="username"
-          label="用户名"
-          placeholder="用户名"
-          :rules="[{ required: true, message: '请填写用户名' }]"
-        />
-        <van-field
-          v-model="state.password"
-          type="password"
-          name="password"
-          label="密码"
-          placeholder="密码"
-          :rules="[{ required: true, message: '请填写密码' }]"
-        />
-        <van-field
-          center
-          clearable
-          label="验证码"
-          placeholder="输入验证码"
-          v-model="state.verify"
-        >
+        <van-field v-model="state.username" name="username" label="手机号" placeholder="请输入手机号"
+          :rules="[{ required: true, message: '请填写手机号' }]" />
+        <van-field v-model="state.password" type="password" name="password" label="密码" placeholder="密码"
+          :rules="[{ required: true, message: '请填写密码' }]" />
+        <van-field center clearable label="验证码" placeholder="输入验证码" v-model="state.verify">
           <template #button>
             <vue-img-verify ref="verifyRef" />
           </template>
@@ -48,28 +31,11 @@
     </div>
     <div v-else class="login-body register">
       <van-form @submit="onSubmit">
-        <van-field
-          v-model="state.username1"
-          name="username1"
-          label="用户名"
-          placeholder="用户名"
-          :rules="[{ required: true, message: '请填写用户名' }]"
-        />
-        <van-field
-          v-model="state.password1"
-          type="password"
-          name="password1"
-          label="密码"
-          placeholder="密码"
-          :rules="[{ required: true, message: '请填写密码' }]"
-        />
-        <van-field
-          center
-          clearable
-          label="验证码"
-          placeholder="输入验证码"
-          v-model="state.verify"
-        >
+        <van-field v-model="state.username1" name="username1" label="手机号" placeholder="请输入手机号"
+          :rules="[{ required: true, message: '请填写手机号' }]" />
+        <van-field v-model="state.password1" type="password" name="password1" label="密码" placeholder="密码"
+          :rules="[{ required: true, message: '请填写密码' }]" />
+        <van-field center clearable label="验证码" placeholder="输入验证码" v-model="state.verify">
           <template #button>
             <vue-img-verify ref="verifyRef" />
           </template>
@@ -136,70 +102,83 @@ const onSubmit = async (values) => {
 </script>
 
 <style lang="less">
+.login {
+  .logo {
+    width: 120px;
+    height: 120px;
+    display: block;
+    margin: 80px auto 20px;
+  }
+
+  .login-body {
+    padding: 0 20px;
+  }
+
   .login {
-    .logo {
-      width: 120px;
-      height: 120px;
-      display: block;
-      margin: 80px auto 20px;
+    .link-register {
+      font-size: 14px;
+      margin-bottom: 20px;
+      color: #1989fa;
+      display: inline-block;
     }
-    .login-body {
-      padding: 0 20px;
+  }
+
+  .register {
+    .link-login {
+      font-size: 14px;
+      margin-bottom: 20px;
+      color: #1989fa;
+      display: inline-block;
     }
-    .login {
-      .link-register {
-        font-size: 14px;
-        margin-bottom: 20px;
-        color: #1989fa;
-        display: inline-block;
-      }
+  }
+
+  .verify-bar-area {
+    margin-top: 24px;
+
+    .verify-left-bar {
+      border-color: #1baeae;
     }
-    .register {
-      .link-login {
-        font-size: 14px;
-        margin-bottom: 20px;
-        color: #1989fa;
-        display: inline-block;
-      }
+
+    .verify-move-block {
+      background-color: #1baeae;
+      color: #fff;
     }
-    .verify-bar-area {
-      margin-top: 24px;
-      .verify-left-bar {
-        border-color: #1baeae;
-      }
-      .verify-move-block {
-        background-color: #1baeae;
-        color: #fff;
-      }
+  }
+
+  .verify {
+    >div {
+      width: 100%;
     }
-    .verify {
-      >div {
-        width: 100%;
+
+    display: flex;
+    justify-content: center;
+
+    .cerify-code-panel {
+      margin-top: 16px;
+    }
+
+    .verify-code {
+      width: 40% !important;
+      float: left !important;
+    }
+
+    .verify-code-area {
+      float: left !important;
+      width: 54% !important;
+      margin-left: 14px !important;
+
+      .varify-input-code {
+        width: 90px;
+        height: 38px !important;
+        border: 1px solid #e9e9e9;
+        padding-left: 10px;
+        font-size: 16px;
       }
-      display: flex;
-      justify-content: center;
-      .cerify-code-panel {
-        margin-top: 16px;
-      }
-      .verify-code {
-        width: 40%!important;
-        float: left!important;
-      }
-      .verify-code-area {
-        float: left!important;
-        width: 54%!important;
-        margin-left: 14px!important;
-        .varify-input-code {
-          width: 90px;
-          height: 38px!important;
-          border: 1px solid #e9e9e9;
-          padding-left: 10px;
-          font-size: 16px;
-        }
-        .verify-change-area {
-          line-height: 44px;
-        }
+
+      .verify-change-area {
+        line-height: 44px;
       }
     }
   }
+}
 </style>
