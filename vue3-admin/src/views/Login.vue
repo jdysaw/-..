@@ -39,10 +39,10 @@ const state = reactive({
   checked: true,
   rules: {
     username: [
-      { required: 'true', message: '账户不能为空', trigger: 'blur' }
+      { required: true, message: '账户不能为空', trigger: 'blur' }
     ],
     password: [
-      { required: 'true', message: '密码不能为空', trigger: 'blur' }
+      { required: true, message: '密码不能为空', trigger: 'blur' }
     ]
   }
 })
@@ -55,6 +55,8 @@ const submitForm = async () => {
       }).then(res => {
         localSet('token', res)
         window.location.href = '/'
+      }).catch(err => {
+        console.error('登录请求异常：', err)
       })
     } else {
       console.log('error submit!!')

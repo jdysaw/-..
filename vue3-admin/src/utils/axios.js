@@ -2,7 +2,7 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import router from '@/router/index'
 import { localGet } from './index'
-import config from '~/config'
+import config from '../../config'
 
 
 // 这边由于后端没有区分测试和正式，姑且都写成一个接口。
@@ -30,6 +30,9 @@ axios.interceptors.response.use(res => {
   }
 
   return res.data.data
+}, error => {
+  ElMessage.error('网络异常，请检查后端服务是否启动！')
+  return Promise.reject(error)
 })
 
 export default axios

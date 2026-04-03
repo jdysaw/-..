@@ -1,6 +1,7 @@
 {
   "name": "admin00",
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "dev": "vite --mode development",
     "build:beta": "vite build --mode beta",
