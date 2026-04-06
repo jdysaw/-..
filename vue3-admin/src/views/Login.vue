@@ -2,10 +2,8 @@
   <div class="login-body">
     <div class="login-container">
       <div class="head">
-        <img class="logo" src="https://s.yezgea02.com/1582958061265/mlogo.png" />
         <div class="name">
-          <div class="title">新蜂商城</div>
-          <div class="tips">Vue3.0 后台管理系统</div>
+          <div class="title">管理员系统</div>
         </div>
       </div>
       <el-form label-position="top" :rules="state.rules" :model="state.ruleForm" ref="loginForm" class="login-form">
@@ -15,8 +13,7 @@
         <el-form-item label="密码" prop="password">
           <el-input type="password" v-model.trim="state.ruleForm.password" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item>
-          <div style="color: #333">登录表示您已同意<a>《服务条款》</a></div>
+        <el-form-item style="margin-top: 20px">
           <el-button style="width: 100%" type="primary" @click="submitForm">立即登录</el-button>
           <el-checkbox v-model="state.checked" @change="!state.checked">下次自动登录</el-checkbox>
         </el-form-item>

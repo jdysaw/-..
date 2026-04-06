@@ -4,8 +4,7 @@
       <el-aside class="aside">
         <div class="head">
           <div>
-            <img src="//s.weituibao.com/1582958061265/mlogo.png" alt="logo">
-            <span>vue3 admin</span>
+            <span>管理员系统</span>
           </div>
         </div>
         <div class="line" />
@@ -18,7 +17,7 @@
         >
           <el-sub-menu index="1">
             <template #title>
-              <span>Dashboard</span>
+              <span>控制台</span>
             </template>
             <el-menu-item-group>
               <el-menu-item index="/add"><el-icon><Plus /></el-icon>添加商品</el-menu-item>

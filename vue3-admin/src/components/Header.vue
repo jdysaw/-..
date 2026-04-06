@@ -36,7 +36,7 @@ import { localRemove, pathMap } from '@/utils'
 
 const router = useRouter()
 const state = reactive({
-  name: 'dashboard',
+  name: '控制台',
   userInfo: null, // 用户信息变量
   hasBack: false, // 是否展示返回icon
 })
