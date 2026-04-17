@@ -20,7 +20,7 @@
             <div class="good-desc">
               <div class="good-title">
                 <span>{{ item.goodsName }}</span>
-                <span>x{{ item.goodsCount }}</span>
+                <van-icon name="delete-o" @click.stop="deleteGood(item.cartItemId)" size="18" color="#999" />
               </div>
               <div class="good-btn">
                 <div class="price">¥{{ item.sellingPrice }}</div>
