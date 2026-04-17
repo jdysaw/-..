@@ -51,7 +51,8 @@ app.config.globalProperties.$filters = {
     if (url && url.startsWith('http')) {
       return url
     } else {
-      url = `http://backend-api-01.newbee.ltd${url}`
+      // 使用本地后端服务地址
+      url = `http://localhost:28019${url}`
       return url
     }
   }

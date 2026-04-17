@@ -10,10 +10,10 @@ package ltd.newbee.mall.api.admin;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import ltd.newbee.mall.common.Constants;
 import ltd.newbee.mall.config.annotation.TokenToAdminUser;
+import ltd.newbee.mall.dao.MallFileMapper;
 import ltd.newbee.mall.entity.AdminUserToken;
-import ltd.newbee.mall.util.NewBeeMallUtils;
+import ltd.newbee.mall.entity.MallFile;
 import ltd.newbee.mall.util.Result;
 import ltd.newbee.mall.util.ResultGenerator;
 import org.slf4j.Logger;
@@ -26,7 +26,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -42,9 +41,12 @@ public class NewBeeAdminUploadAPI {
 
     @Autowired
     private StandardServletMultipartResolver standardServletMultipartResolver;
+    
+    @Autowired
+    private MallFileMapper mallFileMapper;
 
     /**
-     * 图片上传
+     * 图片上传 - 存储到数据库
      */
     @RequestMapping(value = "/upload/file", method = RequestMethod.POST)
     @ApiOperation(value = "单图上传", notes = "file Name \"file\"")
@@ -52,24 +54,27 @@ public class NewBeeAdminUploadAPI {
         logger.info("adminUser:{}", adminUser.toString());
         String fileName = file.getOriginalFilename();
         String suffixName = fileName.substring(fileName.lastIndexOf("."));
-        //生成文件名称通用方法
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
-        Random r = new Random();
-        StringBuilder tempName = new StringBuilder();
-        tempName.append(sdf.format(new Date())).append(r.nextInt(100)).append(suffixName);
-        String newFileName = tempName.toString();
-        File fileDirectory = new File(Constants.FILE_UPLOAD_DIC);
-        //创建文件
-        File destFile = new File(Constants.FILE_UPLOAD_DIC + newFileName);
+        
         try {
-            if (!fileDirectory.exists()) {
-                if (!fileDirectory.mkdir()) {
-                    throw new IOException("文件夹创建失败,路径为：" + fileDirectory);
-                }
+            // 将文件转换为Base64
+            byte[] fileBytes = file.getBytes();
+            String base64Content = Base64.getEncoder().encodeToString(fileBytes);
+            
+            // 创建文件实体
+            MallFile mallFile = new MallFile();
+            mallFile.setFileName(fileName);
+            mallFile.setFileSuffix(suffixName);
+            mallFile.setFileContent(base64Content);
+            
+            // 保存到数据库
+            int insertResult = mallFileMapper.insert(mallFile);
+            if (insertResult < 1) {
+                return ResultGenerator.genFailResult("文件上传失败");
             }
-            file.transferTo(destFile);
+            
+            // 返回数据库中的文件ID，前端通过这个ID获取图片
             Result resultSuccess = ResultGenerator.genSuccessResult();
-            resultSuccess.setData(NewBeeMallUtils.getHost(new URI(httpServletRequest.getRequestURL() + "")) + "/upload/" + newFileName);
+            resultSuccess.setData("/db-file/" + mallFile.getFileId());
             return resultSuccess;
         } catch (IOException e) {
             e.printStackTrace();
@@ -78,7 +83,7 @@ public class NewBeeAdminUploadAPI {
     }
 
     /**
-     * 图片上传
+     * 图片上传 - 多图上传存储到数据库
      */
     @RequestMapping(value = "/upload/files", method = RequestMethod.POST)
     @ApiOperation(value = "多图上传", notes = "wangEditor图片上传")
@@ -108,23 +113,25 @@ public class NewBeeAdminUploadAPI {
         for (int i = 0; i < multipartFiles.size(); i++) {
             String fileName = multipartFiles.get(i).getOriginalFilename();
             String suffixName = fileName.substring(fileName.lastIndexOf("."));
-            //生成文件名称通用方法
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
-            Random r = new Random();
-            StringBuilder tempName = new StringBuilder();
-            tempName.append(sdf.format(new Date())).append(r.nextInt(100)).append(suffixName);
-            String newFileName = tempName.toString();
-            File fileDirectory = new File(Constants.FILE_UPLOAD_DIC);
-            //创建文件
-            File destFile = new File(Constants.FILE_UPLOAD_DIC + newFileName);
             try {
-                if (!fileDirectory.exists()) {
-                    if (!fileDirectory.mkdir()) {
-                        throw new IOException("文件夹创建失败,路径为：" + fileDirectory);
-                    }
+                // 将文件转换为Base64
+                byte[] fileBytes = multipartFiles.get(i).getBytes();
+                String base64Content = Base64.getEncoder().encodeToString(fileBytes);
+                
+                // 创建文件实体
+                MallFile mallFile = new MallFile();
+                mallFile.setFileName(fileName);
+                mallFile.setFileSuffix(suffixName);
+                mallFile.setFileContent(base64Content);
+                
+                // 保存到数据库
+                int insertResult = mallFileMapper.insert(mallFile);
+                if (insertResult < 1) {
+                    return ResultGenerator.genFailResult("文件上传失败");
                 }
-                multipartFiles.get(i).transferTo(destFile);
-                fileNames.add(NewBeeMallUtils.getHost(new URI(httpServletRequest.getRequestURL() + "")) + "/upload/" + newFileName);
+                
+                // 添加到返回结果
+                fileNames.add("/db-file/" + mallFile.getFileId());
             } catch (IOException e) {
                 e.printStackTrace();
                 return ResultGenerator.genFailResult("文件上传失败");
@@ -133,6 +140,28 @@ public class NewBeeAdminUploadAPI {
         Result resultSuccess = ResultGenerator.genSuccessResult();
         resultSuccess.setData(fileNames);
         return resultSuccess;
+    }
+    
+    /**
+     * 获取数据库中的图片 - 根据文件ID返回Base64图片
+     */
+    @RequestMapping(value = "/db-file/{fileId}", method = RequestMethod.GET)
+    @ApiOperation(value = "获取数据库图片", notes = "根据文件ID获取Base64图片")
+    public Result getFileById(@PathVariable("fileId") Long fileId) {
+        try {
+            MallFile mallFile = mallFileMapper.selectById(fileId);
+            if (mallFile == null) {
+                return ResultGenerator.genFailResult("文件不存在");
+            }
+            // 返回完整的 Base64 Data URL
+            String base64Url = "data:image" + mallFile.getFileSuffix() + ";base64," + mallFile.getFileContent();
+            Result resultSuccess = ResultGenerator.genSuccessResult();
+            resultSuccess.setData(base64Url);
+            return resultSuccess;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResultGenerator.genFailResult("获取文件失败");
+        }
     }
 
 }
